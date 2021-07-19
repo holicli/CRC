@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.daniutec.crc.mapper.NavigationMapper">
+
+    <select id="getnavigationListByPId" resultType="com.daniutec.crc.model.bo.Navigation">
+        SELECT *  from pf_menu WHERE PARENT_ID = #{pid}
+    </select>
+
+    <select id="getNavigationByPid" resultType="com.daniutec.crc.model.bo.Navigation">
+        select c.MENU_ID,c.PARENT_ID,c.PX,c.`CODE`,c.`NAME`,c.LINK, c.ICON,c.`ENABLE`,c.DESCRIPTION,c.ADD_DATE from pf_user a
+                                                                                                                        LEFT JOIN  pf_role_menu b ON a.ROLE_ID=b.ROLE_ID
+                                                                                                                        LEFT JOIN pf_menu c ON c.MENU_ID=b.MENU_ID
+        where USERID=#{userid} and PARENT_ID = 0
+    </select>
+</mapper>

@@ -1,0 +1,159 @@
+### 调试模式
+debug: false
+
+### 服务器配置
+server:
+  port: 9090
+  servlet:
+    encoding:
+      force: true
+      charset: UTF-8
+
+### Spring通用配置 ###
+spring:
+  profiles:
+    # dev开发环境，prod生产环境，test测试环境
+    active: dev
+
+  # springboot 配置
+  main:
+    banner-mode: off
+    log-startup-info: false
+
+  # 程序属性配置
+  application:
+    name: crc
+    # 获取应用版本
+    version: 1.0.0
+
+  # 开启@Scheduled和@Async注解支持
+  task:
+    scheduling:
+      pool:
+        size: 10
+    execution:
+      pool:
+        core-size: 16
+        max-size: 64
+        queue-capacity: 256
+
+#  # quartz调度
+#  quartz:
+#    job-store-type: jdbc
+
+  # 配置redis缓存
+  cache:
+    type: redis
+
+  # 上传文件
+  servlet:
+    multipart:
+      max-file-size: 512MB
+      max-request-size: 2GB
+
+  # web属性配置
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+    throw-exception-if-no-handler-found: true
+
+### mybatis-plus配置
+mybatis-plus:
+  type-enums-package: com.daniutec.crc.model
+  mapper-locations: classpath*:**/mapping/**/*.xml
+  type-aliases-package: com.daniutec.crc
+  configuration:
+    # 开启xml级缓存
+    cache-enabled: true
+    lazy-loading-enabled: true
+    call-setters-on-nulls: true
+    aggressive-lazy-loading: true
+    map-underscore-to-camel-case: true
+    auto-mapping-unknown-column-behavior: warning
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+  global-config:
+    banner: false
+    db-config:
+      # 逻辑删除全局属性名
+      logic-delete-field: deleted
+
+### javamelody监控配置
+javamelody:
+  init-parameters:
+    url-exclude-pattern: (/webjars/.*|/static/.*|/scripts/.*|/images/.*|/css/.*|/js/.*|/fonts/.*|/files/.*)
+
+---
+##### 开发环境 ####
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  # 模板引擎
+  thymeleaf:
+    cache: false
+
+  # redis配置
+  redis:
+    database: 5
+    host: 112.124.202.230
+    password: q1w2e3r4!
+    lettuce:
+      pool:
+        max-active: 50
+        max-idle: 50
+
+  # 数据源配置
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://112.124.202.230:3306/cig_retail_collect?allowMultiQueries=true&tinyInt1isBit=false
+    username: root
+    password: daniutec
+    hikari:
+      maximum-pool-size: 50
+      connection-test-query: SELECT 1
+
+#  # 初始化sql脚本
+#  sql:
+#    init:
+#      schema-locations: classpath:schema.sql
+#      encoding: UTF-8
+#      mode: always
+
+### 密码工具
+jasypt:
+  encryptor:
+    password: 0Iz1!B@I2l29
+
+---
+##### 生产环境 ####
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  # redis配置
+  redis:
+    host: 127.0.0.1
+    password: ENC(FnetP79aqNAaEm2k9QF5W5eAdr3G7TVTLFXcojsONYr28MgzK4zBoZxQshdLBq8zSLw==)
+    lettuce:
+      pool:
+        max-active: 256
+        max-idle: 256
+
+  # 数据源配置
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://112.124.202.230:3306/cig_retail_collect?allowMultiQueries=true&tinyInt1isBit=false
+    username: root
+    password: daniutec
+    hikari:
+      maximum-pool-size: 50
+      connection-test-query: SELECT 1
+
+### 密码工具
+jasypt:
+  encryptor:
+    pool-size: 32
+    password: ${JASYPT_PASSWORD}

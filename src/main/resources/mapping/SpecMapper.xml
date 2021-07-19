@@ -1,0 +1,466 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.daniutec.crc.mapper.SpecMapper">
+    <resultMap type="com.daniutec.crc.model.bo.RetailReport" id="RetailReportMap">
+        <result property="closeDate" column="closeDate" />
+        <result property="startDate" column="startDate" />
+        <result property="endDate" column="endDate" />
+        <result property="reportYear" column="reportYear" />
+        <result property="reportMonth" column="reportMonth" />
+        <result property="reportWeek" column="reportWeek" />
+        <result property="reportType" column="reportType" />
+        <result property="saleStatus" column="saleStatus" />
+        <result property="stockStatus" column="stockStatus" />
+        <result property="reportPeriod" column="reportPeriod" />
+        <result property="company" column="company" />
+        <result property="url" column="url" />
+        <result property="cigaretteNo" column="cigaretteNo" />
+        <result property="cigaretteName" column="cigaretteName" />
+        <result property="suggestion" column="suggestion" />
+        <result property="wholesalePrice" column="wholesalePrice" />
+        <result property="retailPrice" column="retailPrice" />
+        <result property="marketPrice" column="marketPrice" />
+        <result property="purchasePrice" column="purchasePrice" />
+        <result property="cartonPrice" column="cartonPrice" />
+        <result property="packPrice" column="packPrice" />
+    </resultMap>
+    <resultMap type="com.daniutec.crc.model.bo.Warning" id="WarningMap">
+        <result property="lb" column="LB" />
+        <result property="ggbs" column="GGBS" />
+        <result property="minPrice" column="JG_MIN" />
+        <result property="maxPrice" column="JG_MAX" />
+    </resultMap>
+
+    <!-- 查询采集上报周期-->
+    <select id="findPeriod" resultMap="RetailReportMap" parameterType="string">
+        select
+            tl.lrrq closeDate,
+            tl.cj_ksrq startDate,
+            tl.cj_jsrq endDate,
+            tl.sblx reportType,
+            tr.cj_nf reportYear,
+            tr.cj_yf reportMonth,
+            tr.cj_yz reportWeek
+        from
+            t_lrrq tl,
+            td_rq tr
+        where
+            tl.lrrq = tr.rqdm
+          and date(#{date}) &lt;= date(cj_jsrq)
+          and date(#{date}) &gt;= date(cj_ksrq)
+    </select>
+
+    <!-- 查询保存上报信息-->
+    <select id="reportExist" parameterType="map" resultType="int">
+        select
+            count(1)
+        from e_jgsb
+        where
+            lrrq=#{closeDate}
+          and lsh_id=#{userId}
+          and ggbs=#{cigaretteNo}
+    </select>
+
+    <!-- 查询保存区域上报信息-->
+    <select id="reportExistBSC" parameterType="map" resultType="int">
+        select
+            count(1)
+        from e_jgsb_bsc
+        where
+            lrrq=#{closeDate}
+          and lsh_id=#{userId}
+          and ggbs=#{cigaretteNo}
+    </select>
+
+    <!-- 插入上报信息 -->
+    <insert id="addRetailReport" useGeneratedKeys="true" parameterType="map">
+        insert into e_jgsb
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            lsh_id,
+            lshbh,
+            ggbs,
+            lrrq,
+            cj_ksrq,
+            cj_jsrq,
+            sblx,
+            <if test="marketPrice!=null and marketPrice!=''">xl,</if>
+            <if test="purchasePrice!=null and purchasePrice!=''">gjl,</if>
+            <if test="cartonPrice!=null and cartonPrice!=''">kc,</if>
+            <if test="packPrice!=null and packPrice!=''">tjjg,</if>
+            gxsj,
+            bzw
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{userId},
+            #{retailNo},
+            #{cigaretteNo},
+            #{closeDate},
+            #{startDate},
+            #{endDate},
+            #{reportType},
+            <if test="marketPrice!=null and marketPrice!=''">#{marketPrice},</if>
+            <if test="purchasePrice!=null and purchasePrice!=''">#{purchasePrice},</if>
+            <if test="cartonPrice!=null and cartonPrice!=''">#{cartonPrice},</if>
+            <if test="packPrice!=null and packPrice!=''">#{packPrice},</if>
+            now(),
+            0
+        </trim>
+    </insert>
+
+    <!-- 插入上报信息 -->
+    <insert id="addRetailReportBSC" useGeneratedKeys="true" parameterType="map">
+        insert into e_jgsb_bsc
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            lsh_id,
+            lshbh,
+            ggbs,
+            lrrq,
+            cj_ksrq,
+            cj_jsrq,
+            sblx,
+            <if test="marketPrice!=null and marketPrice!=''">jsjyj,</if>
+            <if test="purchasePrice!=null and purchasePrice!=''">jssgj,</if>
+            <if test="cartonPrice!=null and cartonPrice!=''">ztlsj,</if>
+            <if test="packPrice!=null and packPrice!=''">dblsj,</if>
+            <if test="saleStatus!=null and saleStatus!=''">zt,</if>
+            <if test="stockStatus!=null and stockStatus!=''">hyqk,</if>
+            gxsj,
+            jy,
+            yx,
+            bzw
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{userId},
+            #{retailNo},
+            #{cigaretteNo},
+            #{closeDate},
+            #{startDate},
+            #{endDate},
+            #{reportType},
+            <if test="marketPrice!=null and marketPrice!=''">#{marketPrice},</if>
+            <if test="purchasePrice!=null and purchasePrice!=''">#{purchasePrice},</if>
+            <if test="cartonPrice!=null and cartonPrice!=''">#{cartonPrice},</if>
+            <if test="packPrice!=null and packPrice!=''">#{packPrice},</if>
+            <if test="saleStatus!=null and saleStatus!=''">#{saleStatus},</if>
+            <if test="stockStatus!=null and stockStatus!=''">#{stockStatus},</if>
+            now(),
+            #{suggestion},
+            1,
+            0
+        </trim>
+    </insert>
+
+    <!-- 删除上报信息 -->
+    <delete id="deleteRetailReport" parameterType="map">
+        delete from e_jgsb where ggbs = #{cigaretteNo} and lsh_id=#{userId} and lrrq=#{closeDate}
+    </delete>
+
+    <!-- 删除区域上报信息 -->
+    <delete id="deleteRetailReportBSC" parameterType="map">
+        delete from e_jgsb_bsc where ggbs = #{cigaretteNo} and lsh_id=#{userId} and lrrq=#{closeDate}
+    </delete>
+
+    <!-- 修改上报信息 -->
+    <update id="updateRetailReport" parameterType="map">
+        update e_jgsb
+        <set>
+            xl=#{marketPrice},
+            gjl=#{purchasePrice},
+            kc=#{cartonPrice},
+            tjjg=#{packPrice},
+
+            gxsj=now(),
+
+        </set>
+        where
+        ggbs = #{cigaretteNo}
+        and lsh_id=#{userId}
+        and lrrq=#{closeDate}
+    </update>
+
+    <!-- 修改区域上报信息 -->
+    <update id="updateRetailReportBSC" parameterType="map">
+        update e_jgsb_bsc
+        <set>
+            jsjyj=#{marketPrice},
+            jssgj=#{purchasePrice},
+            ztlsj=#{cartonPrice},
+            dblsj=#{packPrice},
+            <if test="saleStatus!=null and saleStatus!=''">zt=#{saleStatus},</if>
+            <if test="stockStatus!=null and stockStatus!=''">hyqk=#{stockStatus},</if>
+            gxsj=now(),
+            jy=#{suggestion}
+        </set>
+        where
+        ggbs = #{cigaretteNo}
+        and lsh_id=#{userId}
+        and lrrq=#{closeDate}
+    </update>
+
+    <!-- 查询香烟信息-->
+    <select id="findCigarette" parameterType="map" resultType="com.daniutec.crc.model.bo.RetailReport">
+        select
+            b.gygsmc company,
+            c.pfj wholesalePrice,
+            c.lsj retailPrice,
+            c.ggbs cigaretteNo,
+            c.url url,
+            c.ggmc cigaretteName,
+            e.tjjg packPrice,
+            e.gjl purchasePrice,
+            e.xl marketPrice,
+            e.kc cartonPrice
+        from
+            (select
+                 tj.bhsdbj,
+                 tj.hsdbj,
+                 tj.pfj,
+                 tj.lsj,
+                 tj.jgbs,
+                 tgj.px,
+                 tg.ggmc,
+                 tgj.url,
+                 tj.ggbs,
+                 tg.sbsyzbs,
+                 tgj.px ss
+             from
+                 td_jgml tj,
+                 td_gg_jpg tgj,
+                 td_gg tg
+             where
+                 tg.ggbs = tgj.ggbs
+               and tg.ggbs = tj.ggbs
+               and tgj.sfzt = 1
+               and tgj.sfmb = 1
+               and date(tj.ksrq) &lt;= date(#{date})
+            and date(tj.jsrq) &gt;= date(#{date})
+            and tg.jssj = '3000-12-31'
+        order by tgj.px
+            ) c
+            left join e_jgsb e on e.ggbs = c.ggbs and date(#{date}) = e.lrrq and e.lsh_id = #{userId}
+            left join td_gygs b on c.sbsyzbs = b.gygsdm
+        order by c.ss
+    </select>
+
+    <!-- 查询区域香烟信息-->
+    <select id="findCigaretteBSC" parameterType="map" resultType="com.daniutec.crc.model.bo.RetailReport">
+        select
+            b.gygsmc company,
+            c.pfj wholesalePrice,
+            c.lsj retailPrice,
+            c.ggbs cigaretteNo,
+            c.url url,
+            c.ggmc cigaretteName,
+            e.tjjg marketPrice,
+            e.gjl purchasePrice,
+            e.xl cartonPrice,
+            e.kc packPrice
+        from
+            (select
+                 tj.bhsdbj,
+                 tj.hsdbj,
+                 tj.pfj,
+                 tj.lsj,
+                 tj.jgbs,
+                 tgj.px,
+                 tg.ggmc,
+                 tgj.url,
+                 tj.ggbs,
+                 tg.sbsyzbs,
+                 tgj.px ss
+             from
+                 td_jgml tj,
+                 td_gg_jpg_bsc tgj,
+                 td_gg tg
+             where
+                 tg.ggbs = tgj.ggbs
+               and tg.ggbs = tj.ggbs
+               and tgj.sfzt = 1
+               and tgj.sfmb = 1
+               and date(tj.ksrq) &lt;= date(#{date})
+            and date(tj.jsrq) &gt;= date(#{date})
+            and tg.jssj = '3000-12-31'
+        order by tgj.px
+            ) c
+            left join e_jgsb_bsc e on e.ggbs = c.ggbs and date(#{date}) = e.lrrq and e.lsh_id = #{userId}
+            left join td_gygs b on c.sbsyzbs = b.gygsdm
+        order by c.ss
+    </select>
+
+    <!-- 查询香烟信息-->
+    <select id="findCigaretteCount" parameterType="string" resultType="int">
+        select
+            count(1) total
+        from td_jgml tj,
+             td_gg_jpg tgj,
+             td_gg tg
+        where
+            tg.ggbs = tgj.ggbs
+          and tg.ggbs = tj.ggbs
+          and tgj.sfzt = 1
+          and tgj.sfmb = 1
+          and date(tj.ksrq) &lt;= date(#{date})
+          and date(tj.jsrq) &gt;= date(#{date})
+          and tg.jssj = '3000-12-31'
+        order by tgj.px
+    </select>
+
+    <!-- 查询区域香烟信息-->
+    <select id="findCigaretteCountBSC" parameterType="string" resultType="int">
+        select
+            count(1) total
+        from td_jgml tj,
+             td_gg_jpg_bsc tgj,
+             td_gg tg
+        where
+            tg.ggbs = tgj.ggbs
+          and tg.ggbs = tj.ggbs
+          and tgj.sfzt = 1
+          and tgj.sfmb = 1
+          and date(tj.ksrq) &lt;= date(#{date})
+          and date(tj.jsrq) &gt;= date(#{date})
+          and tg.jssj = '3000-12-31'
+        order by tgj.px
+    </select>
+
+    <!-- 查询市场流通价格是否合理 -->
+    <select id="priceCheck" parameterType="map" resultType="int">
+        select
+            count(1)
+        from t_lsh_yjfw
+        where
+            ggbs=#{cigaretteNo}
+          and #{marketPrice} &gt;= jg_min
+          and #{marketPrice} &lt;= jg_max
+    </select>
+
+    <select id="priceWarnings" parameterType="string" resultType="map">
+        select jg_min ,jg_max ,lb from e_lsh_yjfw
+        where ggbs=#{cigaretteNo} order by lb asc
+
+    </select>
+
+
+    <!-- 查询零售户编号 -->
+    <select id="findRetailNo" parameterType="string" resultType="string">
+        select lshbh from td_lsh where id = #{userId}
+    </select>
+
+    <!-- 批量更新上报信息 -->
+    <update id="updateRetailReports" parameterType="list">
+        update e_jgsb
+        set bzw=1, sbsj=now()
+        where
+        ggbs in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item.cigaretteNo}
+        </foreach>
+        and lsh_id in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item.userId}
+        </foreach>
+        and lrrq in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item.closeDate}
+        </foreach>
+    </update>
+
+    <!-- 批量更新区域上报信息 -->
+    <update id="updateRetailReportsBSC" parameterType="list">
+        update e_jgsb_bsc
+        set bzw=1, sbsj=now()
+        where
+        ggbs in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item.cigaretteNo}
+        </foreach>
+        and lsh_id in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item.userId}
+        </foreach>
+        and lrrq in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item.closeDate}
+        </foreach>
+    </update>
+
+    <!-- 查询审核表是否有数据 -->
+    <select id="findCheckReport" parameterType="map" resultType="int">
+        select count(1) from t_lsh_shjg where lsh_id=#{userId} and lrrq=#{closeDate}
+    </select>
+
+    <!-- 查询区域审核表是否有数据 -->
+    <select id="findCheckReportBSC" parameterType="map" resultType="int">
+        select count(1) from t_lsh_shjg_bsc where lsh_id=#{userId} and lrrq=#{closeDate}
+    </select>
+
+    <!-- 插入审核数据-->
+    <insert id="addCheckReport" useGeneratedKeys="true" parameterType="map">
+        insert into t_lsh_shjg
+            (lsh_id,lrrq,shzt,ycdm,shsj,gxsj)
+        values
+            (#{userId},#{closeDate},1,0,now(),now())
+    </insert>
+
+    <!-- 插入区域审核数据-->
+    <insert id="addCheckReportBSC" useGeneratedKeys="true" parameterType="map">
+        insert into t_lsh_shjg_bsc
+            (lsh_id,lrrq,shzt,ycdm,shsj,gxsj)
+        values
+            (#{userId},#{closeDate},1,0,now(),now())
+    </insert>
+
+    <!-- 删除审核数据 -->
+    <delete id="deleteCheckReport" parameterType="map">
+        delete from t_lsh_shjg where lsh_id=#{userId} and lrrq=#{closeDate}
+    </delete>
+
+    <!-- 删除区域审核数据 -->
+    <delete id="deleteCheckReportBSC" parameterType="map">
+        delete from t_lsh_shjg_bsc where lsh_id=#{userId} and lrrq=#{closeDate}
+    </delete>
+
+    <!--更新审核表数据 -->
+    <update id="updateCheckReport" parameterType="map">
+        update t_lsh_shjg set GXSJ=now() where lsh_id=#{userId} and lrrq=#{closeDate}
+    </update>
+
+    <!--更新审核表数据 -->
+    <update id="updateCheckReportBSC" parameterType="map">
+        update t_lsh_shjg_bsc set GXSJ=now() where lsh_id=#{userId} and lrrq=#{closeDate}
+    </update>
+
+    <!-- 插入上报审核表-->
+    <insert id="addData" useGeneratedKeys="true" parameterType="map">
+        call p_etl_lsh_jgsh (
+            #{userId,jdbcType=INTEGER},
+            #{closeDate,jdbcType=DATE},
+            #{reportType,jdbcType=INTEGER}
+            );
+    </insert>
+
+    <!-- 插入区域上报审核表-->
+    <insert id="addDataBSC" useGeneratedKeys="true" parameterType="map">
+        call p_etl_lsh_jgsh_bsc (
+            #{userId,jdbcType=INTEGER},
+            #{closeDate,jdbcType=DATE},
+            #{reportType,jdbcType=INTEGER}
+            );
+    </insert>
+
+    <!-- 插入市场建议-->
+    <insert id="addScjy" useGeneratedKeys="true" parameterType="map">
+        insert into e_jysb
+            (lsh_id,lrrq,jy,zt,gxsj)
+        values
+            (#{userId},#{closeDate},#{data},1,now())
+    </insert>
+
+    <!-- 插入区域市场建议-->
+    <insert id="addScjyBSC" useGeneratedKeys="true" parameterType="map">
+        insert into e_jysb_bsc
+            (lsh_id,lrrq,jy,zt,gxsj)
+        values
+            (#{userId},#{closeDate},#{data},1,now())
+    </insert>
+</mapper>

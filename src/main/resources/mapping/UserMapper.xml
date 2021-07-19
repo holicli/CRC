@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.daniutec.crc.mapper.UserMapper">
+
+    <cache type="com.daniutec.crc.misc.ibatis.MybatisRedisCache">
+        <property name="flushInterval" value="5000"/>
+    </cache>
+
+    <!-- 获取用户角色集合 -->
+    <select id="listRole" parameterType="long" resultType="string">
+        /* 用户表基础角色 */
+        WITH user_role AS(
+            SELECT
+                m.privilege
+            FROM t_user_menu um
+            LEFT JOIN t_user u ON um.user_id = u.row_id
+            LEFT JOIN t_menu m ON m.row_id = um.menu_id
+            WHERE u.row_id = #{userId} AND m.privilege IS NOT NULL AND m.privilege != '' AND m.type = 1
+        ),
+        /* 用户组角色 */
+        ext_role AS(
+            SELECT
+                m.privilege
+            FROM t_group_menu gm
+            LEFT JOIN t_menu m ON m.row_id = gm.menu_id
+            LEFT JOIN t_group_user gu ON gm.group_id = gu.group_id
+            LEFT JOIN t_user u ON u.row_id = gu.user_id
+            WHERE u.row_id = #{userId} AND m.privilege IS NOT NULL AND m.privilege != '' AND m.type = 1
+        ),
+        total_role AS(
+            SELECT privilege FROM user_role
+            UNION
+            SELECT privilege FROM ext_role
+        )
+        SELECT privilege FROM total_role
+    </select>
+
+    <!-- 通过用户ID查找用户权限信息 -->
+    <select id="listPermission" parameterType="long" resultType="string">
+        /* 用户表基础权限 */
+        WITH user_perms AS(
+            SELECT
+                m.privilege
+            FROM t_user_menu um
+            LEFT JOIN t_user u ON um.user_id = u.row_id
+            LEFT JOIN t_menu m ON m.row_id = um.menu_id
+            WHERE u.row_id = #{userId} AND m.privilege IS NOT NULL AND m.privilege != '' AND m.type &gt; 1
+        ),
+        /*扩展权限 */
+        ext_perms AS(
+            SELECT
+                m.privilege
+            FROM t_group_menu gm
+            LEFT JOIN t_menu m ON m.row_id = gm.menu_id
+            LEFT JOIN t_group_user gu ON gm.group_id = gu.group_id
+            LEFT JOIN t_user u ON u.row_id = gu.user_id
+            WHERE u.row_id = #{userId} AND m.privilege IS NOT NULL AND m.privilege != '' AND m.type &gt; 1
+        ),
+        total_perms AS(
+            SELECT privilege FROM user_perms
+            UNION
+            SELECT privilege FROM ext_perms
+        )
+        SELECT privilege FROM total_perms
+    </select>
+
+    <select id="getUserbyname" resultType="com.daniutec.crc.model.po.UserPO">
+        select * from pf_user WHERE USERID=#{userId}
+    </select>
+</mapper>

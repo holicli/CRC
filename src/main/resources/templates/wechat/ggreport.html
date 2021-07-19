@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+    <head>
+        <base href="${pageContext.request.contextPath}/">
+
+        <title>价格上报</title>
+        <meta charset="UTF-8">
+
+        <meta name="renderer" content="webkit">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0"/>
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+        <meta name="apple-touch-fullscreen" content="yes"/>
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+        <link rel="stylesheet" th:href="@{/static/css/skins.css}" href="../static/css/skins.css">
+        <link rel="stylesheet" th:href="@{/static/css/wechat/style.min.css}" href="../static/css/wechat/style.min.css">
+        <link rel="stylesheet" th:href="@{/static/css/font-awesome.min.css}" href="../static/css/font-awesome.min.css">
+
+
+
+        <style>
+            .page-box {
+                bottom: 0;
+                background: #f3f4f8;
+                padding: 0.75rem 0
+            }
+
+            .text-choice h3 {
+                font-size: 0.65rem;
+                color: #333
+            }
+
+            .text-choice h3 span {
+                font-size: 0.6rem;
+                color: #666
+            }
+
+            .time-head .choice {
+                font-size: 0.9em
+            }
+
+            .ui-dialog-content {
+                border-bottom: 0.01rem solid #52aaee;
+            }
+
+            .preview-box .page-box {
+                position: fixed !important;
+
+            }
+
+            .markets .m-input {
+                height: 1.125rem;
+                width: 6.25rem;
+                display: inline-block;
+                border-bottom: 1px solid #666;
+                font-size: 0.65rem;
+                text-align: center;
+            }
+
+            .ui-dialog-footer button.ui-dialog-autofocus {
+                font-size: 46px;
+                margin-right: 5.5rem;
+            }
+        </style>
+    </head>
+
+    <body style="background: #f3f4f8;" class="price-section">
+    <section>
+        <div id="setday" class="time-head">
+            <label for="day" style="float: none;">采集日期：</label>
+            <p class="choice">
+                <i class="fa fa-calendar"></i>
+                <span id="day" data=""></span>
+            </p>
+        </div>
+
+        <div id="jgsb">
+
+        </div>
+
+        <!---悬浮--->
+        <div class="suspension">
+            <div class="s-logo">
+                <span class="newsBtn" id="total">1/${report.data.counts}</span>
+            </div>
+            <select class="s-select" id="s-select">
+<!--                <c:forEach items="${report.data.cigarette}" var="item"-->
+<!--                           varStatus="status">-->
+<!--                    <option value="${status.index+1}">${status.index+1}-${item.cigaretteName}</option>-->
+<!--                </c:forEach>-->
+            </select>
+        </div>
+        <div class="page-box">
+            <ul style="width: 12.5rem;">
+                <li><a href="javascript:;" class="prev" id="pageup">上一页</a></li>
+                <li class="pages" style="width: 4.75rem;"></li>
+                <li><a href="javascript:;" class="next" id="pagedown">下一页</a></li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- 预览 -->
+    <section class="preview-box" style="display:none" id="yl_info">
+        <div class="gray"></div>
+        <div class="preview-con">
+            <h3>预览</h3>
+            <div class="preview-table">
+                <table>
+                    <tbody id="select">
+                    </tbody>
+                </table>
+            </div>
+            <div class="page-box">
+                <ul>
+                    <li><a href="javascript:;" class="qd">确定</a></li>
+                    <li class="pages"></li>
+                    <li><a href="javascript:;" class="qx"
+                           style="background: #eee; color: #999;">取消</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="frame-box" style="display: none" id="sbcjjy_tck">
+        <div style="display: none" id="scjy_tck">
+            <div class="gray"></div>
+            <div class="frame-con">
+                <div class="write">
+                    <i class="fa fa-pencil"></i>
+                </div>
+                <div class="frame-close">
+                    <a href="javascript:;" class="gb">关闭</a>
+                </div>
+                <div class="frame-form">
+                    <h3>市场总体情况：(*选填项)</h3>
+                    <textarea maxlength="2000" id="scjy_content"></textarea>
+                    <button id="submit">提交</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="success-box">
+        <div class="gray"></div>
+        <div class="success-con">
+            <img src="resources/images/wechat/success.png"/>
+            <a href="index"></a>
+        </div>
+    </section>
+
+    <section style="display: none" id="Info_xxk" class="public-section">
+        <div class="public-box">
+            <div class="gray"></div>
+            <div class="public-con">
+                <h3 id="Info"></h3>
+                <div class="yes">
+                    <a href="javascript:;" id="Info_qr">确定</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section style="display: none" id="Info_xxk2" class="public-section">
+        <div class="public-box">
+            <div class="gray"></div>
+            <div class="public-con">
+                <h3 id="Infos">价格不在合理区间，请返回修改</h3>
+                <div class="yes">
+                    <a href="javascript:;" id="Info_xg">修改</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- 价格信息弹窗 -->
+    <section class="input-frame" id="ss">
+        <div class="gray"></div>
+        <div class="input-con">
+            <h3>
+                市场流通价<span>(当地大户出手价)</span>
+            </h3>
+            <div>
+                <!-- <span class="content" contenteditable="true" ></span><span class="unit">元&nbsp;/&nbsp;条</span></div> -->
+                <input type="number" step="0.01" class="content"></input><span
+                    class="unit">元&nbsp;/&nbsp;条</span>
+            </div>
+            <div class="input-btns">
+                <a href="javascript:;" class="qx">取消</a> <a href="javascript:;"
+                                                            class="qd">确定</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 市场动态信息弹窗 -->
+    <section class="markets-frame">
+        <div class="gray"></div>
+        <div class="markets-con">
+            <h3>市场动态信息</h3>
+            <div>
+                <textarea class="contents" maxlength="200"></textarea>
+            </div>
+            <div class="input-btns">
+                <a href="javascript:;" class="qx">取消</a> <a href="javascript:;"
+                                                            class="qd">确定</a>
+            </div>
+        </div>
+    </section>
+
+    <script th:src="@{/static/assets/jquery.min.js}" src="../static/assets/jquery.min.js"></script>
+    <script th:src="@{/static/assets/dialog-min.js}" src="../static/assets/dialog-min.js"></script>
+    <script th:src="@{/static/assets/date-formate.js}" src="../static/assets/date-formate.js"></script>
+    <script th:src="@{/static/assets/wechat/base.js}" src="../static/assets/wechat/base.js"></script>
+    <script th:src="@{/static/assets/wechat/prices.js}" src="../static/assets/wechat/prices.js"></script>
+
+
+
+    <script type="text/javascript">
+
+        var u = navigator.userAgent, app = navigator.appVersion;
+        var isAndroid = u.indexOf('Android') > -1 || u.indexOf('Linux') > -1; //g
+        var isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+        if (isAndroid) {
+            var x = document.body.clientWidth;
+
+            var y = document.body.clientHeight;
+
+            $("body").width(x);
+
+            $("body").height(y);
+            $("body").css({"position":"fixed","left":"0","top":"0"});
+            $(".page-box").css("position","absolute");
+        }
+        if (isIOS) {
+
+            $(".page-box").css("position","fixed");
+        }
+
+        /* 获取窗口滚动条高度 */
+        function getScrollTop() {
+            var scrollTop = 0;
+            if (document.documentElement && document.documentElement.scrollTop) {
+                scrollTop = document.documentElement.scrollTop;
+            } else if (document.body) {
+                scrollTop = document.body.scrollTop;
+            }
+            return scrollTop;
+        };
+
+        var oldScrollTop = getScrollTop() || 0; // 记录当前滚动位置
+
+        document.body.addEventListener('focusin', function (event) {
+            //alert("键盘谈起");
+        });
+        document.body.addEventListener('focusout', function (event) { //软键盘关闭事件
+            var ua = window.navigator.userAgent;
+            if (ua.indexOf('iPhone') > 0 || ua.indexOf('iPad') > 0) { //键盘收起页面空白问题
+                document.body.scrollTop = oldScrollTop;
+                document.documentElement.scrollTop = oldScrollTop;
+            } else {
+                $('body').height($('body')[0].clientHeight);
+            }
+        });
+
+    </script>
+
+
+    </body>
+</html>

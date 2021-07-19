@@ -1,0 +1,10 @@
+{
+  "properties": [
+    {
+      "name": "spring.application.version",
+      "type": "java.lang.String",
+      "description": "当前应用程序版本号.",
+      "defaultValue": "1.0.0",
+      "sourceType": "com.daniutec.crc.misc.config.WebConfig"
+  }
+] }

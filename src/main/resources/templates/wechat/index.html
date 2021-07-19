@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <title>信息采集</title>
+
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-touch-fullscreen" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <link rel="stylesheet" th:href="@{/static/css/wechat/style.min.css}" href="../static/css/wechat/style.min.css">
+    <link rel="stylesheet" th:href="@{/static/css/font-awesome.min.css}" href="../static/css/font-awesome.min.css">
+    <style>
+        .last-box li:nth-of-type(2) .icon-bg {
+            background: #c9ce00;
+        }
+
+        .notice-con {
+            width: 14rem;
+            height: 19.8rem;
+            margin: 0 auto;
+            background-color: #fff;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            z-index: 666;
+            margin: -10rem -7rem;
+            border: 1px solid #ccc;
+            border-radius: .25rem;
+            -webkit-border-radius: .25rem;
+            box-shadow: .075rem .05rem .1rem rgba(0, 0, 0, 0.2);
+            -webkit-box-shadow: .075rem .05rem .1rem rgba(0, 0, 0, 0.2)
+        }
+
+        .notice-con span {
+            margin: .3rem;
+            font-size: .83rem;
+        }
+
+        .notice-con .yes {
+            width: 100%;
+            line-height: 2.5rem;
+            background: #f2f2f2;
+            border-top: 1px solid #cdcdcd;
+            padding: .5rem 0
+        }
+
+        .notice-con .yes a {
+            width: 3rem;
+            height: 1.5rem;
+            display: block;
+            text-align: center;
+            line-height: 1.5rem;
+            border-radius: .25rem;
+            -webkit-border-radius: .25rem;
+            background-color: #229ffd;
+            border-color: #229ffd;
+            color: #fff;
+            margin: 0 auto
+        }
+
+        #notice_time {
+            background-color: #f2f2f2;
+            border-color: #cdcdcd;
+            color: #000000;
+        }
+    </style>
+</head>
+<body>
+<section>
+    <div class="banner">
+        <img src="/resources/images/wechat/banner.jpg"/>
+    </div><!-- //end div.banner -->
+
+    <div class="list-box">
+        <h6>价格采集</h6>
+        <ul>
+            <li id="jgsb">
+                <a href="/wechat/spec/index" class="icon-bg" style="background-color: #fbd03a!important">
+                    <i class="fa fa-line-chart"></i>
+                </a>
+                <a href="/wechat/spec/index" class="name">采集上报</a>
+            </li>
+            <li>
+                <a href="wechat/report/index" class="icon-bg" style="background-color: #5ba7f8!important">
+                    <i class="fa fa-exchange"></i>
+                </a>
+                <a href="wechat/report/index" class="name">上报查询</a>
+            </li>
+            <li>
+                <a href="wechat/record/index" class="icon-bg" style="background-color: #47d955!important">
+                    <i class="fa fa-copy"></i>
+                </a>
+                <a href="wechat/record/index" class="name">采集记录</a>
+            </li>
+        </ul>
+    </div><!-- //end div.list-box -->
+
+    <div class="list-box second-box">
+        <h6>个人中心</h6>
+        <ul>
+            <li>
+                <a href="wechat/userInfo/index" class="icon-bg" style="background-color: #f96c56!important">
+                    <i class="fa fa-address-book"></i>
+                </a>
+                <a href="wechat/userInfo/index" class="name">个人信息</a>
+            </li>
+            <li>
+                <a href="wechat/message/index" class="icon-bg" style="background-color:#49da56!important">
+                    <i class="fa fa-bell"></i>
+                    <span id="xxInfo_count" style="position: relative;top: -108%;left: 77%;color: red;display:none">new</span>
+                </a>
+                <a href="wechat/message/index" class="name">消息提醒</a>
+            </li>
+        </ul>
+    </div><!-- //end div.second-box -->
+
+</section>
+<section style="display:none;position: absolute;top: 0;left: 0;z-index:999" id="Info_xxk" class="public-section">
+    <div class="public-box">
+        <div class="gray"></div>
+        <div class="public-con">
+            <!-- <h3 id="Info">您有新的未读消息，请在“消息提醒”中查看。</h3> -->
+            <h3 id="Info" style="line-height:3.25em">您有新的未读消息，<br><span style="position: relative;top: -17px;">请在“消息提醒”中查看。</span>
+            </h3>
+            <div class="yes">
+                <a href="javascript:;" id="Info_qr">确定</a>
+            </div>
+        </div>
+    </div>
+</section>
+<section style="display:none;position: absolute;top: 0;left: 0;z-index:999" id="Info_market" class="public-section">
+    <div class="public-box">
+        <div class="gray"></div>
+        <div class="public-con">
+            <!-- <h3 id="Info">您有新的未读消息，请在“消息提醒”中查看。</h3> -->
+            <h3 id="Info_markets" style="line-height:3.25em"> 调研活动已经停止，<br><span
+                    style="position: relative;top: -17px;">谢谢您的参与 !</span></h3>
+            <div class="yes">
+                <a href="javascript:;" id="Info_search">确定</a>
+            </div>
+        </div>
+    </div>
+</section>
+<section style="display:none;position: absolute;top: 0;left: 0;z-index:999" id="notice" class="public-section">
+    <div class="public-box">
+        <div class="gray"></div>
+        <div class="notice-con">
+            <span id="notice_info"></span>
+            <div class="yes">
+                <a href="javascript:;" id="notice_time" style="display: block;background-color: #f2f2f2;color: #000000;"><i id="time">10</i></a>
+                <a href="javascript:;" id="notice_qd" style="display: none;">确定</a>
+            </div>
+        </div>
+    </div>
+</section>
+<script th:src="@{/static/assets/jquery.min.js}" src="../static/assets/jquery.min.js"></script>
+<script th:src="@{/static/assets/wechat/base.js}" src="../static/assets/wechat/base.js"></script>
+<script th:src="@{/static/assets/wechat/prices.js}" src="../static/assets/wechat/index.js"></script>
+</body>
+</html>
