@@ -87,6 +87,7 @@
             <if test="purchasePrice!=null and purchasePrice!=''">gjl,</if>
             <if test="cartonPrice!=null and cartonPrice!=''">kc,</if>
             <if test="packPrice!=null and packPrice!=''">tjjg,</if>
+            jy,
             gxsj,
             bzw
         </trim>
@@ -102,6 +103,7 @@
             <if test="purchasePrice!=null and purchasePrice!=''">#{purchasePrice},</if>
             <if test="cartonPrice!=null and cartonPrice!=''">#{cartonPrice},</if>
             <if test="packPrice!=null and packPrice!=''">#{packPrice},</if>
+            #{suggestion},
             now(),
             0
         </trim>
@@ -170,7 +172,7 @@
             tjjg=#{packPrice},
 
             gxsj=now(),
-
+            jy=#{suggestion}
         </set>
         where
         ggbs = #{cigaretteNo}
@@ -209,7 +211,8 @@
             e.tjjg packPrice,
             e.gjl purchasePrice,
             e.xl marketPrice,
-            e.kc cartonPrice
+            e.kc cartonPrice,
+            e.jy suggestion
         from
             (select
                  tj.bhsdbj,
@@ -349,7 +352,7 @@
     <!-- 批量更新上报信息 -->
     <update id="updateRetailReports" parameterType="list">
         update e_jgsb
-        set bzw=1, sbsj=now()
+        set bzw=1
         where
         ggbs in
         <foreach collection="list" index="index" item="item" open="(" separator="," close=")">

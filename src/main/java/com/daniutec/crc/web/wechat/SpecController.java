@@ -115,8 +115,8 @@ public class SpecController {
      */
     @ResponseBody
     @PostMapping("addData")
-    public WebResult<Object> addData(@RequestParam Map<String, Object> map, @Principal User user) {
-        map.put("userId", user.getUsername());
+    public WebResult<Object> addData(@RequestParam Map<String, Object> map, @Principal UserInfo user) {
+        map.put("userId", user.getUserid());
         return service.addData(map);
     }
 
@@ -130,8 +130,8 @@ public class SpecController {
      */
     @ResponseBody
     @PostMapping("deleteData")
-    public WebResult<Object> deleteData(String closeDate, @Principal User user) {
-        return service.deleteData(closeDate, user.getUsername());
+    public WebResult<Object> deleteData(String closeDate, @Principal UserInfo user) {
+        return service.deleteData(closeDate, user.getUserid());
     }
 
 
@@ -144,8 +144,8 @@ public class SpecController {
      */
     @ResponseBody
     @PostMapping("addScjy")
-    public WebResult<Object> addScjy(@RequestParam Map<String, Object> map, @Principal User user) {
-        map.put("userId", user.getUsername());
+    public WebResult<Object> addScjy(@RequestParam Map<String, Object> map, @Principal UserInfo user) {
+        map.put("userId", user.getUserid());
         return service.addScjy(map);
     }
 
